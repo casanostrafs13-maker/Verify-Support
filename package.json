@@ -1,0 +1,6 @@
+{
+  "name": "fb-login",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "20.x" }
+}
